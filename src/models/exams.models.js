@@ -5,7 +5,7 @@ const examSchema = new mongoose.Schema({
   category: { type: String, enum: ["free", "paid"], default: "paid" },
   marks: { type: Number, default: 20 },
   questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "questions" }],
-  conductedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
+  conductedBy: [{ type: String, ref: "users" }],
   addedAt: { type: Date, default: Date.now },
 });
 
