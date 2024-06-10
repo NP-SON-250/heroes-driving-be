@@ -6,7 +6,7 @@ const newConductSchema = mongoose.Schema({
           ref: 'exams',
           required: true
         },
-        userId: {type: mongoose.Schema.Types.ObjectId,ref: 'users', required: true},
+        userId: { type: String, ref: "users" },
         responses: [
           {
             questionId: {
