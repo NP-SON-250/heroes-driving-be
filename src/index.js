@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import dbConnector from "./app.js";
 import morgan from "morgan";
 import cors from "cors";
-// import router from "./routes/index.js";
+import router from "./routes/index.js";
 
 const app = express();
 dotenv.config();
@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Routes
-// app.use('/api/v1', router)
+app.use('/api/v1', router)
 dbConnector;
 const PORT = process.env.PORT || 4200;
 
