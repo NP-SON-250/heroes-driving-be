@@ -1,5 +1,5 @@
-import examModel from "../modelssd/exams.models";
-import questionModel from "../modelssd/questions.models";
+import examModel from "../models/exams.models";
+import questionModel from "../models/questions.models";
 
 export const addExam = async (req, res) => {
   try {
