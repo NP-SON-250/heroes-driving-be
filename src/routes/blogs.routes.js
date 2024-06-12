@@ -1,0 +1,11 @@
+import express from "express";
+import fileUpload from "../helper/multer";
+import { adminAuth } from "../middleware/auth.middleware";
+import { createPost, getPosts, getOnePost, updatePost, deletePost } from "../controllers/blogs.controllers";
+const postRoutes = express.Router();
+postRoutes.get("/", getPosts);
+postRoutes.get("/:postId", getOnePost);
+postRoutes.post("/", fileUpload.single("image"), adminAuth,createPost);
+postRoutes.put("/:id", fileUpload.single("image"), adminAuth, updatePost);
+postRoutes.delete("/:id", adminAuth, deletePost);
+export default postRoutes;

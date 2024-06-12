@@ -6,7 +6,7 @@ import questionRoute from "./questions.routes";
 import optionRoute from "./options.routes";
 import newResponsesRoute from "./newconducts.routes";
 import categoryRoute from "./categories.routes";
-
+import postRoutes from "./blogs.routes";
 
 const router = express.Router();
 
@@ -18,5 +18,7 @@ router.use("/categories", categoryRoute);
 router.use("/questions",questionRoute);
 router.use("/options",optionRoute);
 router.use("/newresponses",newResponsesRoute);
+router.use("/posts",postRoutes);
+
 
 export default router;
