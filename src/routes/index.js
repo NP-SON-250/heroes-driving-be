@@ -7,7 +7,7 @@ import optionRoute from "./options.routes";
 import newResponsesRoute from "./newconducts.routes";
 import categoryRoute from "./categories.routes";
 import postRoutes from "./blogs.routes";
-
+import MomopaymentRoute from "./Momopayments.routes";
 const router = express.Router();
 
 // Route
@@ -19,6 +19,7 @@ router.use("/questions",questionRoute);
 router.use("/options",optionRoute);
 router.use("/newresponses",newResponsesRoute);
 router.use("/posts",postRoutes);
+router.use("/momo",MomopaymentRoute)
 
 
 export default router;
