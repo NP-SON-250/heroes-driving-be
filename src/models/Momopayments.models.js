@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const { Schema, model } = mongoose;
 
-const paymentSchema = new Schema(
+const momoPaymentSchema = new Schema(
   {
     _id: { type: String, default: uuidv4 },
     catId: { type: String, ref: "PaidCategories", required: true },
@@ -22,6 +22,6 @@ const paymentSchema = new Schema(
   {}
 );
 
-const PaymentModel = model("payments", paymentSchema);
+const MomoPaymentModel = model("Momopayments", momoPaymentSchema);
 
-export default PaymentModel;
+export default MomoPaymentModel;

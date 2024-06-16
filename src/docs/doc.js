@@ -21,6 +21,10 @@ const options = {
       description: "Users' operations",
     },
     {
+      name: "Catecories",
+      description: "Categories' operations",
+    },
+    {
       name: "Exams",
       description: "Exams' operations",
     },
@@ -37,12 +41,8 @@ const options = {
       description: "Response operations",
     },
     {
-      name: "Payment Catecories",
-      description: "Payment categories' operations",
-    },
-    {
-      name: "Payments",
-      description: "Payment operations",
+      name: "MoMo Payments",
+      description: "MoMo Payment operations",
     },
     {
       name: "Posts",
@@ -253,13 +253,227 @@ const options = {
       },
     },
 
-    // Exam routes
 
-    "/api/v1/exams/record": {
+    // Payment category routes
+
+    "/api/v1/categories/record": {
+      post: {
+        tags: ["Catecories"],
+        summary: "Add category",
+        description: "Record new category",
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  examsNumber: {
+                    type: "number",
+                  },
+                  amount: {
+                    type: "string",
+                  },
+                  duration: {
+                    type: "number",
+                  },
+                  type:{
+                    type: "string",
+                    enum: ["free", "paid"],
+                  }
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Category recorded",
+          },
+          400: {
+            description: "Bad request",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/categories/all": {
+      get: {
+        tags: ["Catecories"],
+        summary: "View all categories",
+        description: "Get all exams registered",
+        responses: {
+          200: {
+            description: "All categories retrieved",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/categories/all/free": {
+      get: {
+        tags: ["Catecories"],
+        summary: "View all free categories",
+        description: "Get all free categories registered",
+        responses: {
+          200: {
+            description: "All free categories retrieved",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/categories/all/paid": {
+      get: {
+        tags: ["Catecories"],
+        summary: "View all paid categories",
+        description: "Get all paid categories registered",
+        responses: {
+          200: {
+            description: "All paid categories retrieved",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/categories/single/{id}": {
+      get: {
+        tags: ["Catecories"],
+        summary: "View single category",
+        description: "Get single category by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Single category retrieved",
+          },
+          404: {
+            description: "category not found",
+          },
+          500: {
+            description: "internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/categories/update/{id}": {
+      put: {
+        tags: ["Catecories"],
+        summary: "Category updating",
+        description: "Update category by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  examsNumber: {
+                    type: "number",
+                  },
+                  amount: {
+                    type: "string",
+                  },
+                  duration: {
+                    type: "number",
+                  },
+                  type:{
+                    type:"string",
+                    enum: ["free", "paid"],
+                  }
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Category Updated",
+          },
+          400: {
+            description: "Category title exist",
+          },
+          404: {
+            description: "Category not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/categories/delete/{id}": {
+      delete: {
+        tags: ["Catecories"],
+        summary: "Delete category",
+        description: "Delete single category by Id",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Category deleted",
+          },
+          404: {
+            description: "Category not fount",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+
+
+    // Exam routes
+    "/api/v1/exams/record/{catId}": {
       post: {
         tags: ["Exams"],
-        summary: "Add exam",
-        description: "Record new exam",
+        summary: "Add Exam to category",
+        description: "Category Id to add exam",
+        parameters: [
+          {
+            name: "catId",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
         requestBody: {
           content: {
             "multipart/form-data": {
@@ -271,10 +485,6 @@ const options = {
                   },
                   time: {
                     type: "number",
-                  },
-                  category: {
-                    type: "string",
-                    enum: ["free", "paid"],
                   },
                 },
               },
@@ -295,6 +505,7 @@ const options = {
         },
       },
     },
+    
     "/api/v1/exams/all": {
       get: {
         tags: ["Exams"],
@@ -310,36 +521,7 @@ const options = {
         },
       },
     },
-    "/api/v1/exams/all/free": {
-      get: {
-        tags: ["Exams"],
-        summary: "View all free exams",
-        description: "Get all free exams registered",
-        responses: {
-          200: {
-            description: "All free exams retrieved",
-          },
-          500: {
-            description: "Internal server error",
-          },
-        },
-      },
-    },
-    "/api/v1/exams/all/paid": {
-      get: {
-        tags: ["Exams"],
-        summary: "View all paid exams",
-        description: "Get all paid exams registered",
-        responses: {
-          200: {
-            description: "All paid exams retrieved",
-          },
-          500: {
-            description: "Internal server error",
-          },
-        },
-      },
-    },
+    
     "/api/v1/exams/single/{id}": {
       get: {
         tags: ["Exams"],
@@ -394,10 +576,6 @@ const options = {
                   },
                   time: {
                     type: "number",
-                  },
-                  category: {
-                    type: "string",
-                    enum: ["free", "paid"],
                   },
                 },
               },
@@ -915,175 +1093,12 @@ const options = {
       },
     },
 
-    // Payment category routes
-
-    "/api/v1/categories/record": {
-      post: {
-        tags: ["Payment Catecories"],
-        summary: "Add category",
-        description: "Record new category",
-        requestBody: {
-          content: {
-            "multipart/form-data": {
-              schema: {
-                type: "object",
-                properties: {
-                  exams: {
-                    type: "number",
-                  },
-                  amount: {
-                    type: "string",
-                  },
-                  duration: {
-                    type: "number",
-                  },
-                },
-              },
-            },
-          },
-          required: true,
-        },
-        responses: {
-          200: {
-            description: "Category recorded",
-          },
-          400: {
-            description: "Bad request",
-          },
-          500: {
-            description: "Internal server error",
-          },
-        },
-      },
-    },
-    "/api/v1/categories/all": {
-      get: {
-        tags: ["Payment Catecories"],
-        summary: "View all categories",
-        description: "Get all exams registered",
-        responses: {
-          200: {
-            description: "All categories retrieved",
-          },
-          500: {
-            description: "Internal server error",
-          },
-        },
-      },
-    },
-    "/api/v1/categories/single/{id}": {
-      get: {
-        tags: ["Payment Catecories"],
-        summary: "View single category",
-        description: "Get single category by ID",
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: {
-              type: "string",
-            },
-          },
-        ],
-        responses: {
-          200: {
-            description: "Single category retrieved",
-          },
-          404: {
-            description: "category not found",
-          },
-          500: {
-            description: "internal server error",
-          },
-        },
-      },
-    },
-    "/api/v1/categories/update/{id}": {
-      put: {
-        tags: ["Payment Catecories"],
-        summary: "Category updating",
-        description: "Update category by ID",
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: {
-              type: "string",
-            },
-          },
-        ],
-        requestBody: {
-          content: {
-            "multipart/form-data": {
-              schema: {
-                type: "object",
-                properties: {
-                  exams: {
-                    type: "number",
-                  },
-                  amount: {
-                    type: "string",
-                  },
-                  duration: {
-                    type: "number",
-                  },
-                },
-              },
-            },
-          },
-          required: true,
-        },
-        responses: {
-          200: {
-            description: "Category Updated",
-          },
-          400: {
-            description: "Category title exist",
-          },
-          404: {
-            description: "Category not found",
-          },
-          500: {
-            description: "Internal server error",
-          },
-        },
-      },
-    },
-    "/api/v1/categories/delete/{id}": {
-      delete: {
-        tags: ["Payment Catecories"],
-        summary: "Delete category",
-        description: "Delete single category by Id",
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: {
-              type: "string",
-            },
-          },
-        ],
-        responses: {
-          200: {
-            description: "Category deleted",
-          },
-          404: {
-            description: "Category not fount",
-          },
-          500: {
-            description: "Internal server error",
-          },
-        },
-      },
-    },
+    
 
     // Payment routes
-    "/api/v1/payments/request/{id}": {
+    "/api/v1/momo/request/{id}": {
       post: {
-        tags: ["Payments"],
+        tags: ["MoMo Payments"],
         summary: "Request to pay for exams",
         description: "Initiate a payment request for an exam",
         parameters: [
@@ -1161,9 +1176,9 @@ const options = {
       },
     },
 
-    "/api/v1/payments/status": {
+    "/api/v1/momo/status": {
       get: {
-        tags: ["Payments"],
+        tags: ["MoMo Payments"],
         summary: "Get transaction status",
         description: "Retrieve the status of a payment transaction",
         parameters: [

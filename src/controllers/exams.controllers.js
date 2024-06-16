@@ -1,9 +1,10 @@
 import examModel from "../models/exams.models";
 import questionModel from "../models/questions.models";
-
+import CategoryModel from "../models/category.models";
 export const addExam = async (req, res) => {
   try {
-    const { title, time, category } = req.body;
+    const {catId} =req.params;
+    const { title, time } = req.body;
     if (!title) {
       return res.status(400).json({
         status: "400",
@@ -16,24 +17,36 @@ export const addExam = async (req, res) => {
         message: "Time of exam is required",
       });
     }
-    const checkTitle = await examModel.findOne({ title });
+    
+    const checkTitle = await examModel.findOne({ categoryId: catId });
     if (checkTitle) {
-      if (checkTitle.category == "paid") {
+      if (checkTitle.title === title) {
         return res.status(400).json({
           status: "400",
-          message: "Exam title exist",
+          message: "Exam already exists for this category",
         });
       }
     }
-    const recordExam = await examModel.create({
+    const checkCategory = await CategoryModel.findById(catId);
+    if(!checkCategory){
+      return res.status(404).json({
+        status:"404",
+        message:"Category not found",
+      })
+    }
+    const recordedExam = await examModel.create({
       title,
       time,
-      category,
     });
+    await CategoryModel.findByIdAndUpdate(
+      catId,
+      { $push: { exams: recordedExam._id } },
+      { new: true }
+    );
     return res.status(200).json({
       status: "200",
       message: "Exam recorded",
-      data: recordExam,
+      data: recordedExam,
     });
   } catch (error) {
     return res.status(500).json({
@@ -47,7 +60,7 @@ export const addExam = async (req, res) => {
 export const updateExam = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, time, category } = req.body;
+    const { title, time } = req.body;
     const checkTitle = await examModel.findOne({ title });
     if (checkTitle) {
       if (checkTitle._id != id) {
@@ -67,7 +80,6 @@ export const updateExam = async (req, res) => {
     const updateData = await examModel.findByIdAndUpdate(id, {
       title,
       time,
-      category,
     });
     return res.status(200).json({
       status: "200",
@@ -109,76 +121,6 @@ export const getAll = async (req, res) => {
     return res.status(500).json({
       status: "500",
       message: "Failed to retrieve exams",
-      error: error.message,
-    });
-  }
-};
-
-export const getAllFree = async (req, res) => {
-  try {
-    const userId = req.loggedInUser.id;
-    const allData = await examModel
-      .find({ category: "free", conductedBy: { $nin: [userId] } })
-      .populate({
-        path: "questions",
-        populate: [
-          {
-            path: "options",
-          },
-        ],
-      });
-    if (allData.length === 0) {
-      return res.status(201).json({
-        status: "201",
-        message: "Wasoje gukora ikizamini cy'ubuntu, gura kode",
-      });
-    }
-
-    return res.status(200).json({
-      status: "200",
-      message: "All free exams retrieved",
-      data: allData,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "500",
-      message: "Failed to retrieve all exams",
-      error: error.message,
-    });
-  }
-};
-
-// ===== All exams user has paid =========
-
-export const getAllPaid = async (req, res) => {
-  try {
-    const userId = req.loggedInUser.id;
-    const allData = await examModel
-      .find({ category: "paid", conductedBy: { $nin: [userId] } })
-      .populate({
-        path: "questions",
-        populate: [
-          {
-            path: "options",
-          },
-        ],
-      });
-    if (allData.length === 0) {
-      return res.status(201).json({
-        status: "201",
-        message: "You have exhoused your bonus",
-      });
-    }
-
-    return res.status(200).json({
-      status: "200",
-      message: "All free exams retrieved",
-      data: allData,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: "500",
-      message: "Failed to retrieve all exams",
       error: error.message,
     });
   }

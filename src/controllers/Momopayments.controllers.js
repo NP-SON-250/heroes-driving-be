@@ -1,8 +1,8 @@
 import axios from "axios";
 import base64 from "base-64";
 import * as dotenv from "dotenv";
-import PaymentModel from "../models/payments.models";
-import PaidCategoryModel from "../models/paidcategory.models";
+import MomoPaymentModel from "../models/Momopayments.models";
+import CategoryModel from "../models/category.models";
 import cron from "node-cron";
 dotenv.config();
 
@@ -37,7 +37,7 @@ export const getToken = async () => {
 export const requestToPay = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const existingCategory = await PaidCategoryModel.findById(id);
+    const existingCategory = await CategoryModel.findById(id);
     if (!existingCategory) {
       return res.status(404).json({
         status: "404",
@@ -115,7 +115,7 @@ export const getTransactionStatus = async (req, res) => {
     });
 
     // Save data to payment model
-    const payment = await PaymentModel.create({
+    const payment = await MomoPaymentModel.create({
       catId: momoInfo.XReferenceId,
       userId: response.data.externalId,
       amount: response.data.amount,
@@ -154,7 +154,7 @@ export const getTransactionStatus = async (req, res) => {
 const updateExistanceStatus = async () => {
   try {
     // Find all active payments
-    const activePayments = await PaymentModel.find({
+    const activePayments = await MomoPaymentModel.find({
       existanceStatus: "active",
     }).populate("catId");
 

@@ -191,3 +191,21 @@ export const deleteQuestion = async (req, res) => {
     });
   }
 };
+
+
+export const allQuestions = async (req, res)=>{
+  try {
+    const examsData = await questionModel.find();
+    return res.status(200).json({
+      status:"200",
+      message:"Questions retrieved.",
+      data: examsData,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      status: "500",
+      message: "Failed to retrieve questions",
+      error: error.message,
+    });
+  }
+  }
