@@ -177,3 +177,7 @@ const updateExistanceStatus = async () => {
 
 // This will run every day at midnight
 cron.schedule("0 0 * * *", updateExistanceStatus);
+
+
+
+

@@ -8,6 +8,7 @@ import newResponsesRoute from "./newconducts.routes";
 import categoryRoute from "./categories.routes";
 import postRoutes from "./blogs.routes";
 import MomopaymentRoute from "./Momopayments.routes";
+import paymentRoutes from "./payment.routes";
 const router = express.Router();
 
 // Route
@@ -19,6 +20,7 @@ router.use("/questions",questionRoute);
 router.use("/options",optionRoute);
 router.use("/newresponses",newResponsesRoute);
 router.use("/posts",postRoutes);
+router.use("/payments",paymentRoutes)
 router.use("/momo",MomopaymentRoute)
 
 

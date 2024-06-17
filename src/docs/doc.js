@@ -48,6 +48,10 @@ const options = {
       name: "Posts",
       description: "Operations related to Posts' entities",
     },
+    {
+      name: "Payments",
+      description: "Operations related to Payments' entities",
+    },
   ],
   paths: {
     "/api/v1/users/signup": {
@@ -192,6 +196,9 @@ const options = {
               schema: {
                 type: "object",
                 properties: {
+                  fullname: {
+                    type: "string",
+                  },
                   username: {
                     type: "string",
                   },
@@ -253,7 +260,6 @@ const options = {
       },
     },
 
-
     // Payment category routes
 
     "/api/v1/categories/record": {
@@ -276,10 +282,10 @@ const options = {
                   duration: {
                     type: "number",
                   },
-                  type:{
+                  type: {
                     type: "string",
                     enum: ["free", "paid"],
-                  }
+                  },
                 },
               },
             },
@@ -402,10 +408,10 @@ const options = {
                   duration: {
                     type: "number",
                   },
-                  type:{
-                    type:"string",
+                  type: {
+                    type: "string",
                     enum: ["free", "paid"],
-                  }
+                  },
                 },
               },
             },
@@ -457,7 +463,6 @@ const options = {
       },
     },
 
-
     // Exam routes
     "/api/v1/exams/record/{catId}": {
       post: {
@@ -505,7 +510,7 @@ const options = {
         },
       },
     },
-    
+
     "/api/v1/exams/all": {
       get: {
         tags: ["Exams"],
@@ -521,7 +526,7 @@ const options = {
         },
       },
     },
-    
+
     "/api/v1/exams/single/{id}": {
       get: {
         tags: ["Exams"],
@@ -1093,9 +1098,7 @@ const options = {
       },
     },
 
-    
-
-    // Payment routes
+    // MOMO Payment routes
     "/api/v1/momo/request/{id}": {
       post: {
         tags: ["MoMo Payments"],
@@ -1382,6 +1385,173 @@ const options = {
           },
           404: {
             description: "Post not found",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+
+    // Payments
+    "/api/v1/payments/{categoryId}": {
+      post: {
+        tags: ["Payments"],
+        summary: "User payment",
+        description: "Category Id to user to pay",
+        parameters: [
+          {
+            name: "categoryId",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  phone: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Kwishyura byemejwe",
+          },
+          400: {
+            description: "Shyiramo nemero ya telephone ukoresha wishyura",
+          },
+          404: {
+            description: "Ubwoko wahisemo ntibuhari",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/payments/all": {
+      get: {
+        tags: ["Payments"],
+        summary: "Get All Payments",
+        description: "Get all Payments",
+        responses: {
+          200: {
+            description: "All Payments are retrieved successfully",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    "/api/v1/payments/{id}": {
+      put: {
+        tags: ["Payments"],
+        summary: "Payment updating",
+        description: "Update Payment by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  status: {
+                    type: "string",
+                    enum: ["Ntiremeza", "Yemejwe"],
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Payment Update succeed",
+          },
+          400: {
+            description: "UPad request",
+          },
+          404: {
+            description: "Payment not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+      delete: {
+        tags: ["Payments"],
+        summary: "Delete Payment",
+        description: "Delete a Payment by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Payment deleted successfully",
+          },
+          400: {
+            description: "Bad Request",
+          },
+          404: {
+            description: "Payment not found",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    "/api/v1/payments/{paymentId}": {
+      get: {
+        tags: ["Payments"],
+        summary: "Read Payment By ID",
+        description: "Get a Payment by ID",
+        parameters: [
+          {
+            name: "paymentId",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Payment retrieved successfully",
+          },
+          404: {
+            description: "Payment not found",
           },
           500: {
             description: "Internal Server Error",

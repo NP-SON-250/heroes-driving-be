@@ -37,6 +37,7 @@ export const addExam = async (req, res) => {
     const recordedExam = await examModel.create({
       title,
       time,
+      categoryId: catId,
     });
     await CategoryModel.findByIdAndUpdate(
       catId,
