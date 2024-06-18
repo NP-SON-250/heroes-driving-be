@@ -3,7 +3,6 @@ import cron from "node-cron";
 import PaymentModel from "../models/Payment.models";
 import CategoryModel from "../models/category.models";
 import userModel from "../models/users.models";
-import path from "path";
 
 // Function to send SMS using Clickatell
 const sendSMS = async (to, content) => {
@@ -24,15 +23,23 @@ const sendSMS = async (to, content) => {
       ],
     };
 
+    console.log("Sending SMS with payload:", JSON.stringify(payload, null, 2));
+
     const response = await axios.post(clickatellApiUrl, payload, { headers });
+    console.log("SMS Response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to send SMS:", error.message);
+    if (error.response) {
+      // Capture detailed error response
+      console.error("Failed to send SMS:", error.response.data);
+    } else {
+      console.error("Failed to send SMS:", error.message);
+    }
     throw error;
   }
 };
 
-// Function to generate a random code with mixture of characters and numbers
+// Function to generate a random code with a mixture of characters and numbers
 const generateRandomCode = () => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Alphabetic characters
   const digits = "0123456789"; // Numeric digits
@@ -131,7 +138,11 @@ export const userPayment = async (req, res) => {
     if (smsError) {
       console.error("Failed to send SMS:", smsError);
     }
-
+    await CategoryModel.findByIdAndUpdate(
+      categoryId,
+      { $push: { accessableBy: createPayment.paidBy } },
+      { new: true }
+    );
     return res.status(200).json({
       status: "200",
       message: "Payment recorded successfully",
@@ -227,8 +238,8 @@ export const updatePayment = async (req, res) => {
         message: "Payment not found",
       });
     }
-    const updatedPayment = await PaymentModel.findByIdAndUpdate(id,{
-        status,
+    const updatedPayment = await PaymentModel.findByIdAndUpdate(id, {
+      status,
     });
     return res.status(200).json({
       status: "200",
@@ -248,19 +259,19 @@ export const updatePayment = async (req, res) => {
 
 export const deletePayment = async (req, res) => {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     const deletedPayment = await PaymentModel.findByIdAndDelete(id);
-    if(!deletedPayment){
-        return res.status(404).json({
-            status:"404",
-            message:"Payment not found",
-        });
+    if (!deletedPayment) {
+      return res.status(404).json({
+        status: "404",
+        message: "Payment not found",
+      });
     }
     return res.status(200).json({
-        status:"200",
-        message:"Payment deleted",
-        data:deletedPayment,
-    })
+      status: "200",
+      message: "Payment deleted",
+      data: deletedPayment,
+    });
   } catch (error) {
     console.error("Error deleting payment:", error.message);
     return res.status(500).json({
@@ -270,4 +281,3 @@ export const deletePayment = async (req, res) => {
     });
   }
 };
- 

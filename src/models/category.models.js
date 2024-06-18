@@ -11,6 +11,7 @@ const CategorySchema = new Schema(
     duration: { type: Number, required: true },
     type:{ type: String, enum: ["free", "paid"], default: "paid" },
     exams: [{ type: mongoose.Schema.Types.ObjectId, ref: "exams" }],
+    accessableBy: [{ type: String, ref: "users" }],
     addedAt: { type: Date, default: Date.now }
   },
 );
