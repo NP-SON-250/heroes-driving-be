@@ -110,6 +110,14 @@ export const userPayment = async (req, res) => {
       });
     }
 
+    // Check if the user has already purchased this category
+    if (findCategory.accessableBy.includes(userId)) {
+      return res.status(400).json({
+        status: "400",
+        message: "You currently purchased this category and it is still active",
+      });
+    }
+
     const code = generateRandomCode(); // Generate the random code
 
     // Calculate expiry date and format it to 'YYYY-MM-DD'
@@ -163,12 +171,25 @@ const updateExpiredPayments = async () => {
   try {
     const currentDate = new Date();
     // Find payments where expiredAt date is less than the current date and expireStatus is still 'active'
-    const expiredPayments = await PaymentModel.updateMany(
-      { expiredAt: { $lt: currentDate }, expireStatus: "active" },
-      { $set: { expireStatus: "expired" } }
-    );
+    const expiredPayments = await PaymentModel.find({ expiredAt: { $lt: currentDate }, expireStatus: "active" });
 
-    console.log(`Updated ${expiredPayments.nModified} expired payments.`);
+    // Update expireStatus of found payments
+    const updatePromises = expiredPayments.map(payment =>
+      PaymentModel.findByIdAndUpdate(payment._id, { expireStatus: "expired" })
+    );
+    await Promise.all(updatePromises);
+
+    // Collect userIds and categoryIds from expired payments
+    const userIds = expiredPayments.map(payment => payment.paidBy);
+    const categoryIds = expiredPayments.map(payment => payment.paidCategory);
+
+    // Remove userIds from accessableBy array in the corresponding categories
+    const updateCategoryPromises = categoryIds.map((categoryId, index) =>
+      CategoryModel.findByIdAndUpdate(categoryId, { $pull: { accessableBy: userIds[index] } })
+    );
+    await Promise.all(updateCategoryPromises);
+
+    console.log(`Updated ${expiredPayments.length} expired payments and removed access from categories.`);
   } catch (error) {
     console.error("Error updating expired payments:", error.message);
   }
@@ -179,6 +200,8 @@ cron.schedule("0 0 * * *", () => {
   console.log("Running cron job to update expired payments...");
   updateExpiredPayments();
 });
+
+
 
 // Display all payments
 

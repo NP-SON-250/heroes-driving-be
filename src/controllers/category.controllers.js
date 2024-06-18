@@ -161,7 +161,8 @@ export const getAllFree = async (req, res) => {
 
 export const getAllPaid = async (req, res) => {
   try {
-    const categories = await CategoryModel.find({ type: "paid" }).populate({
+    const userId = req.loggedInUser.id;
+    const categories = await CategoryModel.find({ type: "paid", accessableBy: userId }).populate({
       path: "exams",
       populate: {
         path: "questions",
@@ -170,12 +171,14 @@ export const getAllPaid = async (req, res) => {
         },
       },
     });
-    if (!categories) {
+
+    if (!categories || categories.length === 0) {
       return res.status(404).json({
         status: "404",
         message: "Nta bwoko bwishyuzwa burashyirwaho",
       });
     }
+
     return res.status(200).json({
       status: "200",
       message: "Ubwoko bwishyuzwa ni ubu!!",
@@ -184,11 +187,12 @@ export const getAllPaid = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       status: "500",
-      message: "Kugaragaza ubwoko bwishyuzwa banze",
+      message: "Kugaragaza ubwoko bwishyuzwa byanze",
       error: error.message,
     });
   }
 };
+
 // Get single category
 export const singleCategory = async (req, res) => {
   try {
