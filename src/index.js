@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 
 // Routes
-app.use('/api/v1', router)
+app.use("/api/v1", router);
 dbConnector;
 const PORT = process.env.PORT || 4200;
 
@@ -29,6 +29,6 @@ app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
     author: "AlemaSoft",
-    message: "Welcome to Heroes Driving API!",
+    message: "Welcome to Heroes College API!",
   });
 });

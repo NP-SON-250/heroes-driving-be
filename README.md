@@ -1,3 +1,3 @@
 # heroes-driving-backend
 
-Heroes Driving Website
+Heroes College Website

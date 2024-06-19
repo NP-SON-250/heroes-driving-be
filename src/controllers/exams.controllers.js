@@ -127,6 +127,44 @@ export const getAll = async (req, res) => {
   }
 };
 
+// ======= Read all exams for given category ========
+export const getCategoryExams = async (req, res) => {
+  try {
+    const {id} =req.params;
+    const checkCategory = await CategoryModel.findById(id);
+    if (!checkCategory) {
+      return res.status(404).json({
+        status: "404",
+        message: "Category not found",
+      });
+    }
+    const allData = await examModel
+      .find({categoryId: id})
+      
+      .populate({
+        path: "questions",
+        populate: [
+          {
+            path: "options",
+          },
+        ],
+      });
+    
+
+    return res.status(200).json({
+      status: "200",
+      message: "All exams retrieved",
+      data: allData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "500",
+      message: "Failed to retrieve exams",
+      error: error.message,
+    });
+  }
+};
+
 // ======== Read single exam ========
 
 export const singleExam = async (req, res) => {

@@ -19,14 +19,13 @@ export const addOption = async (req, res) => {
         message: "Question not found",
       });
     }
-    const checkOption = await optionModel.findOne({ questionId: id });
-    if (checkOption) {
-      if (checkOption.option === option) {
-        return res.status(400).json({
-          status: "400",
-          message: "This option already exists on this question",
-        });
-      }
+    // Check for duplicate options
+    const existingOption = await optionModel.findOne({ questionId: id, option });
+    if (existingOption) {
+      return res.status(400).json({
+        status: "400",
+        message: "Option already exists for this question",
+      });
     }
     const currentOptions = await optionModel.find({ questionId: id });
 
@@ -195,6 +194,12 @@ export const deleteOption = async (req, res) => {
         message: "Option not found",
       });
     }
+    const deletedData = await optionModel.findByIdAndDelete(id);
+    return res.status(200).json({
+      status:"200",
+      message: "Option deleted",
+      data: deletedData,
+    })
   } catch (error) {
     return res.status(500).json({
       status: "500",

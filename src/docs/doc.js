@@ -7,7 +7,7 @@ const options = {
   info: {
     title: "Heroes API",
     version: "1.0.0",
-    description: "Heroes driving school documentation API",
+    description: "Heroes College documentation API",
   },
   basPath: "/",
   security: [
@@ -519,6 +519,34 @@ const options = {
         responses: {
           200: {
             description: "All exams retrieved",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
+    "/api/v1/exams/all/{id}": {
+      get: {
+        tags: ["Exams"],
+        summary: "View all Exams based on category ID",
+        description: "Get all registered Exams to category ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "All exams retrieved",
+          },
+          400: {
+            description: "Categories Not found",
           },
           500: {
             description: "Internal server error",
