@@ -162,7 +162,7 @@ export const getAllFree = async (req, res) => {
 export const getAllPaid = async (req, res) => {
   try {
     const userId = req.loggedInUser.id;
-    const categories = await CategoryModel.find({ type: "paid", accessableBy: userId }).populate({
+    const categories = await CategoryModel.find({ type: "paid"}).populate({
       path: "exams",
       populate: {
         path: "questions",

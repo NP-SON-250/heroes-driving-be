@@ -1,6 +1,7 @@
 import examModel from "../models/exams.models";
 import questionModel from "../models/questions.models";
 import CategoryModel from "../models/category.models";
+import responsesModel from "../models/newconducts.models";
 export const addExam = async (req, res) => {
   try {
     const {catId} =req.params;
@@ -130,7 +131,10 @@ export const getAll = async (req, res) => {
 // ======= Read all exams for given category ========
 export const getCategoryExams = async (req, res) => {
   try {
-    const {id} =req.params;
+    const { id } = req.params;
+    const userId = req.loggedInUser.id;
+    
+    // Check if category exists
     const checkCategory = await CategoryModel.findById(id);
     if (!checkCategory) {
       return res.status(404).json({
@@ -138,9 +142,14 @@ export const getCategoryExams = async (req, res) => {
         message: "Category not found",
       });
     }
+
+    // Retrieve examIds where the given userId has responses
+    const userResponses = await responsesModel.find({ userId }).select('examId');
+    const respondedExamIds = userResponses.map(response => response.examId.toString());
+
+    // Fetch exams excluding those that the user has already responded to
     const allData = await examModel
-      .find({categoryId: id})
-      
+      .find({ categoryId: id, _id: { $nin: respondedExamIds } })
       .populate({
         path: "questions",
         populate: [
@@ -149,7 +158,6 @@ export const getCategoryExams = async (req, res) => {
           },
         ],
       });
-    
 
     return res.status(200).json({
       status: "200",
@@ -164,6 +172,7 @@ export const getCategoryExams = async (req, res) => {
     });
   }
 };
+
 
 // ======== Read single exam ========
 
