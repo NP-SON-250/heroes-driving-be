@@ -82,11 +82,10 @@ export const updateExam = async (req, res) => {
     const updateData = await examModel.findByIdAndUpdate(id, {
       title,
       time,
-    });
+    },{ new: true } );
     return res.status(200).json({
       status: "200",
       message: "Exam updated",
-      data: updateData,
     });
   } catch (error) {
     return res.status(500).json({

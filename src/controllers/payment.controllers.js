@@ -288,11 +288,11 @@ export const getSingle = async (req, res) => {
 };
 
 // Update payment status
-
 export const updatePayment = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+    
     const checkPayment = await PaymentModel.findById(id);
     if (!checkPayment) {
       return res.status(404).json({
@@ -300,9 +300,23 @@ export const updatePayment = async (req, res) => {
         message: "Payment not found",
       });
     }
-    const updatedPayment = await PaymentModel.findByIdAndUpdate(id, {
-      status,
-    });
+
+    const updatedPayment = await PaymentModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true } 
+    );
+
+    // If the status is "Yemejwe" (or whatever the correct status is)
+    if (status === "Yemejwe") {
+      const paidCode = checkPayment.code;
+      const checkCode = await PaymentNotifierModel.findOne({ code: paidCode });
+      if (checkCode) {
+        const id = checkCode._id;
+        await PaymentNotifierModel.findByIdAndDelete(id);
+      }
+    }
+
     return res.status(200).json({
       status: "200",
       data: updatedPayment,

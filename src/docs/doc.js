@@ -1637,6 +1637,21 @@ const options = {
         },
       },
     },
+    "/api/v1/notifications/notify": {
+      get: {
+        tags: ["Payments"],
+        summary: "Get All Notifications",
+        description: "Get all Notifications",
+        responses: {
+          200: {
+            description: "All notifications",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {

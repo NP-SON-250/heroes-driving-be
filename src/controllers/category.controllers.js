@@ -84,11 +84,10 @@ export const updateCategory = async (req, res) => {
       amount,
       duration,
       type,
-    });
+    },{ new: true } );
     return res.status(200).json({
       status: "200",
       message: "Category updated",
-      data: updateData,
     });
   } catch (error) {
     return res.status(500).json({

@@ -8,7 +8,7 @@ import {
   getPaymentByCode,
   getSingle,
   updatePayment,
-  deletePayment,
+  deletePayment
 } from "../controllers/payment.controllers";
 
 const paymentRoutes = express.Router();

@@ -107,11 +107,10 @@ export const updateData = async (req, res) => {
         username,
         password: hashedPassword,
         role,
-      });
+      },{ new: true } );
       return res.status(200).json({
         status: "200",
         message: "User Update succeed",
-        data: updatedUser,
       });
     } else {
       const updatedUser = await userModel.findByIdAndUpdate(id, {

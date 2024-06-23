@@ -108,7 +108,7 @@ export const updatePost = async (req, res) => {
       description,
       title,
       image: savedPostImage?.secure_url,
-    });
+    },{ new: true } );
     return res.status(201).json({
       status: "201",
       message: "Post Data Updated",

@@ -90,7 +90,7 @@ export const updateOption = async (req, res) => {
       option,
       questionId: existingOption.questionId,
       _id: { $ne: id },
-    });
+    },{ new: true } );
 
     if (duplicateOption) {
       return res.status(400).json({
@@ -106,7 +106,6 @@ export const updateOption = async (req, res) => {
     return res.status(200).json({
       status: "200",
       message: "Option updated",
-      data: existingOption,
     });
   } catch (error) {
     return res.status(500).json({

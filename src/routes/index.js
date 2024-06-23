@@ -9,19 +9,20 @@ import categoryRoute from "./categories.routes";
 import postRoutes from "./blogs.routes";
 import MomopaymentRoute from "./Momopayments.routes";
 import paymentRoutes from "./payment.routes";
+import notifyRoutes from "./notify.routes";
 const router = express.Router();
 
 // Route
-router.use("/docs",docRouter)
+router.use("/docs", docRouter);
 router.use("/users", userRoute);
 router.use("/exams", examRoute);
 router.use("/categories", categoryRoute);
-router.use("/questions",questionRoute);
-router.use("/options",optionRoute);
-router.use("/newresponses",newResponsesRoute);
-router.use("/posts",postRoutes);
-router.use("/payments",paymentRoutes)
-router.use("/momo",MomopaymentRoute)
-
+router.use("/questions", questionRoute);
+router.use("/options", optionRoute);
+router.use("/newresponses", newResponsesRoute);
+router.use("/posts", postRoutes);
+router.use("/payments", paymentRoutes);
+router.use("/notifications", notifyRoutes)
+router.use("/momo", MomopaymentRoute);
 
 export default router;
