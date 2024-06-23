@@ -7,6 +7,10 @@ const newConductSchema = mongoose.Schema({
           required: true
         },
         userId: { type: String, ref: "users" },
+        correctOptionId:[ {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'options',
+        }],
         responses: [
           {
             questionId: {
@@ -18,7 +22,8 @@ const newConductSchema = mongoose.Schema({
               type: mongoose.Schema.Types.ObjectId,
               ref: 'options',
               required: true
-            }
+            },
+            
           }
         ],
         submittedAt: {

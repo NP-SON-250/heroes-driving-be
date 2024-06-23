@@ -2,7 +2,7 @@ import axios from "axios";
 import cron from "node-cron";
 import PaymentModel from "../models/Payment.models";
 import CategoryModel from "../models/category.models";
-import userModel from "../models/users.models";
+import PaymentNotifierModel from "../models/paymentNotify.models";
 
 // Function to send SMS using Clickatell
 const sendSMS = async (to, content) => {
@@ -30,7 +30,6 @@ const sendSMS = async (to, content) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      // Capture detailed error response
       console.error("Failed to send SMS:", error.response.data);
     } else {
       console.error("Failed to send SMS:", error.message);
@@ -41,21 +40,17 @@ const sendSMS = async (to, content) => {
 
 // Function to generate a random code with a mixture of characters and numbers
 const generateRandomCode = () => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Alphabetic characters
-  const digits = "0123456789"; // Numeric digits
-
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
   let code = "";
 
-  // Generate first part (e.g., A02c)
   for (let i = 0; i < 4; i++) {
     if (i === 0 || i === 2) {
-      // Insert alphabetic characters
       const randomChar = characters.charAt(
         Math.floor(Math.random() * characters.length)
       );
       code += randomChar;
     } else {
-      // Insert numeric digits
       const randomDigit = digits.charAt(
         Math.floor(Math.random() * digits.length)
       );
@@ -63,19 +58,15 @@ const generateRandomCode = () => {
     }
   }
 
-  // Insert dash
   code += "-";
 
-  // Generate second part (e.g., G32v)
   for (let i = 0; i < 4; i++) {
     if (i === 1 || i === 3) {
-      // Insert alphabetic characters
       const randomChar = characters.charAt(
         Math.floor(Math.random() * characters.length)
       );
       code += randomChar;
     } else {
-      // Insert numeric digits
       const randomDigit = digits.charAt(
         Math.floor(Math.random() * digits.length)
       );
@@ -91,14 +82,12 @@ export const userPayment = async (req, res) => {
   try {
     const { categoryId } = req.params;
     const userId = req.loggedInUser.id;
-    const { phone } = req.body;
-    const userInfo = await userModel.findById(userId);
-    const userName = userInfo.fullname;
+    const { phone, names } = req.body; // Get names from request body
 
-    if (!phone) {
+    if (!phone || !names) {
       return res.status(400).json({
         status: "400",
-        message: "Please provide a phone number for payment",
+        message: "Please provide both a phone number and names for payment",
       });
     }
 
@@ -110,7 +99,6 @@ export const userPayment = async (req, res) => {
       });
     }
 
-    // Check if the user has already purchased this category
     if (findCategory.accessableBy.includes(userId)) {
       return res.status(400).json({
         status: "400",
@@ -118,12 +106,18 @@ export const userPayment = async (req, res) => {
       });
     }
 
-    const code = generateRandomCode(); // Generate the random code
-
-    // Calculate expiry date and format it to 'YYYY-MM-DD'
+    const code = generateRandomCode();
     const expiredAt = new Date();
-    expiredAt.setDate(expiredAt.getDate() + findCategory.duration); // Calculate expiry date
-    const formattedExpiredAt = expiredAt.toISOString().slice(0, 10); // Format to 'YYYY-MM-DD'
+    expiredAt.setDate(expiredAt.getDate() + findCategory.duration);
+    const formattedExpiredAt = expiredAt.toISOString().slice(0, 10);
+
+    // Notify admin
+    const addNotification = await PaymentNotifierModel.create({
+      names,
+      phone,
+      code,
+    });
+    console.log(`Admin notified: ${addNotification.names}`);
 
     const examNumber = findCategory.examsNumber;
     const paidAmount = findCategory.amount;
@@ -136,21 +130,21 @@ export const userPayment = async (req, res) => {
       expiredAt: formattedExpiredAt,
     });
 
-    const smsMessage = `Hello, Dear ${userName} Hishyuwe, ${paidAmount} rwf kuri Heros College, uhawe bandle y'imyitozo: ${examNumber}, kode yawe ni: *${code}* Izarangira kuwa: ${formattedExpiredAt}. Uyibikeneza uzajya uyikenera.`;
+    const smsMessage = `Hello, Dear ${names}, hishyuwe ${paidAmount} RWF kuri Heros College. Wemerewe bandle y'imyitozo ${examNumber} kode yawe ni: *${code}*. Izarangira kuri: ${formattedExpiredAt}. Uyibike neza uzajya uyikenera.`;
 
-    // Send SMS using Clickatell after payment recording
     const smsResponse = await sendSMS(phone, smsMessage);
 
-    // Check if the message was not accepted and log detailed error
     const smsError = smsResponse.messages[0].error;
     if (smsError) {
       console.error("Failed to send SMS:", smsError);
     }
+
     await CategoryModel.findByIdAndUpdate(
       categoryId,
       { $push: { accessableBy: createPayment.paidBy } },
       { new: true }
     );
+
     return res.status(200).json({
       status: "200",
       message: "Payment recorded successfully",
@@ -170,26 +164,29 @@ export const userPayment = async (req, res) => {
 const updateExpiredPayments = async () => {
   try {
     const currentDate = new Date();
-    // Find payments where expiredAt date is less than the current date and expireStatus is still 'active'
-    const expiredPayments = await PaymentModel.find({ expiredAt: { $lt: currentDate }, expireStatus: "active" });
+    const expiredPayments = await PaymentModel.find({
+      expiredAt: { $lt: currentDate },
+      expireStatus: "active",
+    });
 
-    // Update expireStatus of found payments
-    const updatePromises = expiredPayments.map(payment =>
+    const updatePromises = expiredPayments.map((payment) =>
       PaymentModel.findByIdAndUpdate(payment._id, { expireStatus: "expired" })
     );
     await Promise.all(updatePromises);
 
-    // Collect userIds and categoryIds from expired payments
-    const userIds = expiredPayments.map(payment => payment.paidBy);
-    const categoryIds = expiredPayments.map(payment => payment.paidCategory);
+    const userIds = expiredPayments.map((payment) => payment.paidBy);
+    const categoryIds = expiredPayments.map((payment) => payment.paidCategory);
 
-    // Remove userIds from accessableBy array in the corresponding categories
     const updateCategoryPromises = categoryIds.map((categoryId, index) =>
-      CategoryModel.findByIdAndUpdate(categoryId, { $pull: { accessableBy: userIds[index] } })
+      CategoryModel.findByIdAndUpdate(categoryId, {
+        $pull: { accessableBy: userIds[index] },
+      })
     );
     await Promise.all(updateCategoryPromises);
 
-    console.log(`Updated ${expiredPayments.length} expired payments and removed access from categories.`);
+    console.log(
+      `Updated ${expiredPayments.length} expired payments and removed access from categories.`
+    );
   } catch (error) {
     console.error("Error updating expired payments:", error.message);
   }
@@ -201,13 +198,55 @@ cron.schedule("0 0 * * *", () => {
   updateExpiredPayments();
 });
 
-
-
 // Display all payments
 
 export const getAll = async (req, res) => {
   try {
-    const getPayment = await PaymentModel.find();
+    const getPayment = await PaymentModel.find().populate({
+      path: "paidCategory",
+      populate: [
+        {
+          path: "exams",
+        },
+      ],
+    });
+    return res.status(200).json({
+      status: "200",
+      message: "All payments",
+      data: getPayment,
+    });
+  } catch (error) {
+    console.error("Error retrieving payments:", error.message);
+    return res.status(500).json({
+      status: "500",
+      message: "Failed to retrieve payments",
+      error: error.message,
+    });
+  }
+};
+
+// Get Payment by code
+export const getPaymentByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const getPayment = await PaymentModel.find({ code }).populate({
+      path: "paidCategory",
+      populate: [
+        {
+          path: "exams",
+          populate: [
+            {
+              path: "questions",
+              populate: [
+                {
+                  path: "options",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
     return res.status(200).json({
       status: "200",
       message: "All payments",

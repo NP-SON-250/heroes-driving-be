@@ -526,6 +526,25 @@ const options = {
         },
       },
     },
+    "/api/v1/exams/freeExams": {
+      get: {
+        tags: ["Exams"],
+        summary: "View all free exams",
+        description: "Get all registered free exams",
+        
+        responses: {
+          200: {
+            description: "All exams retrieved",
+          },
+          400: {
+            description: "Categories Not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+    },
     "/api/v1/exams/all/{id}": {
       get: {
         tags: ["Exams"],
@@ -1446,6 +1465,9 @@ const options = {
                   phone: {
                     type: "string",
                   },
+                  names: {
+                    type: "string",
+                  },
                 },
               },
             },
@@ -1476,6 +1498,34 @@ const options = {
         responses: {
           200: {
             description: "All Payments are retrieved successfully",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    "/api/v1/payments/all/{code}": {
+      get: {
+        tags: ["Payments"],
+        summary: "Read Payment By code",
+        description: "Get a Payment by code",
+        parameters: [
+          {
+            name: "code",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Payment retrieved successfully",
+          },
+          404: {
+            description: "Payment not found",
           },
           500: {
             description: "Internal Server Error",

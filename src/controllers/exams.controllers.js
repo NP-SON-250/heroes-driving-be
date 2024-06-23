@@ -129,10 +129,40 @@ export const getAll = async (req, res) => {
 };
 
 // ======= Read all exams for given category ========
+export const  getFreaaExams = async (req, res) => {
+  try {    
+    // Check if category exists
+    const checkCategory = await CategoryModel.findOne({type:"free"});
+    const id = checkCategory.id;
+    // Fetch exams excluding those that the user has already responded to
+    const allData = await examModel
+      .find({ categoryId: id})
+      .populate({
+        path: "questions",
+        populate: [
+          {
+            path: "options",
+          },
+        ],
+      });
+
+    return res.status(200).json({
+      status: "200",
+      message: "All exams retrieved",
+      data: allData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "500",
+      message: "Failed to retrieve exams",
+      error: error.message,
+    });
+  }
+};
+// ======= Read all exams for given category ========
 export const getCategoryExams = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.loggedInUser.id;
     
     // Check if category exists
     const checkCategory = await CategoryModel.findById(id);
@@ -143,13 +173,9 @@ export const getCategoryExams = async (req, res) => {
       });
     }
 
-    // Retrieve examIds where the given userId has responses
-    const userResponses = await responsesModel.find({ userId }).select('examId');
-    const respondedExamIds = userResponses.map(response => response.examId.toString());
-
     // Fetch exams excluding those that the user has already responded to
     const allData = await examModel
-      .find({ categoryId: id, _id: { $nin: respondedExamIds } })
+      .find({ categoryId: id})
       .populate({
         path: "questions",
         populate: [
