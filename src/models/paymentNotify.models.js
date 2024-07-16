@@ -5,6 +5,7 @@ const paymentNotifySchema = new mongoose.Schema({
     names: {type: String},
     phone: {type: String},
     code:{type: String},
+    status: { type: String, enum: ["Ntiremeza", "Yemejwe"], default: "Ntiremeza" },
     paidOn: { type: Date, default: Date.now },
 });
 

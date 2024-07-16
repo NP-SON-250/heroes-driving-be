@@ -104,7 +104,7 @@ export const updatePost = async (req, res) => {
     }
     let savedPostImage;
     if (req.file) savedPostImage = await uploadToCloud(req.file, res);
-    const createdPost = await Posts.findByIdAndUpdate(id, {
+    const updatedPost = await Posts.findByIdAndUpdate(id, {
       description,
       title,
       image: savedPostImage?.secure_url,
@@ -112,6 +112,7 @@ export const updatePost = async (req, res) => {
     return res.status(201).json({
       status: "201",
       message: "Post Data Updated",
+      data: updatedPost,
     });
   } catch (error) {
     return res.status(500).json({

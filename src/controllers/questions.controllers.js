@@ -102,6 +102,7 @@ export const updateQuestion = async (req, res) => {
     return res.status(200).json({
       status: "200",
       message: "Question updated",
+      data: existingQuestion,
     });
   } catch (error) {
     return res.status(500).json({

@@ -3,7 +3,6 @@ import cron from "node-cron";
 import PaymentModel from "../models/Payment.models";
 import CategoryModel from "../models/category.models";
 import PaymentNotifierModel from "../models/paymentNotify.models";
-
 // Function to send SMS using Clickatell
 const sendSMS = async (to, content) => {
   try {
@@ -290,21 +289,21 @@ export const getSingle = async (req, res) => {
 // Update payment status
 export const updatePayment = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { code } = req.params;
     const { status } = req.body;
-    
-    const checkPayment = await PaymentModel.findById(id);
+
+    const checkPayment = await PaymentModel.findOne({ code });
     if (!checkPayment) {
       return res.status(404).json({
         status: "404",
         message: "Payment not found",
       });
     }
-
+    const id = checkPayment._id;
     const updatedPayment = await PaymentModel.findByIdAndUpdate(
       id,
       { status },
-      { new: true } 
+      { new: true }
     );
 
     // If the status is "Yemejwe" (or whatever the correct status is)

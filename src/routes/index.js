@@ -10,6 +10,10 @@ import postRoutes from "./blogs.routes";
 import MomopaymentRoute from "./Momopayments.routes";
 import paymentRoutes from "./payment.routes";
 import notifyRoutes from "./notify.routes";
+import faqsRoute from "./faqs.routes";
+import replyRoute from "./replyFaqs.routes";
+
+
 const router = express.Router();
 
 // Route
@@ -23,6 +27,8 @@ router.use("/newresponses", newResponsesRoute);
 router.use("/posts", postRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/notifications", notifyRoutes)
+router.use("/faqs", faqsRoute)
+router.use("/replies", replyRoute)
 router.use("/momo", MomopaymentRoute);
 
 export default router;

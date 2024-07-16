@@ -117,7 +117,7 @@ export const updateData = async (req, res) => {
         fullname,
         username,
         role,
-      });
+      },{ new: true });
       return res.status(200).json({
         status: "200",
         message: "User Update succeed",

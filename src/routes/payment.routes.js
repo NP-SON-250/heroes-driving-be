@@ -16,6 +16,6 @@ paymentRoutes.post("/:categoryId",userAuth,fileSaver.single("phone"),userPayment
 paymentRoutes.get("/all",getAll);
 paymentRoutes.get("/all/:code",getPaymentByCode);
 paymentRoutes.get("/:paymentId",getSingle);
-paymentRoutes.put("/:id",adminAuth,fileSaver.single("status"),updatePayment);
+paymentRoutes.put("/:code",adminAuth,fileSaver.single("status"),updatePayment);
 paymentRoutes.delete("/:id",adminAuth,deletePayment);
 export default paymentRoutes;

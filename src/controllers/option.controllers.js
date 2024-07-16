@@ -106,6 +106,7 @@ export const updateOption = async (req, res) => {
     return res.status(200).json({
       status: "200",
       message: "Option updated",
+      data: updatedData,
     });
   } catch (error) {
     return res.status(500).json({

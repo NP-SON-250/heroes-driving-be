@@ -52,6 +52,14 @@ const options = {
       name: "Payments",
       description: "Operations related to Payments' entities",
     },
+    {
+      name: "Faqs",
+      description: "Operations related to Faqs' entities",
+    },
+    {
+      name: "Replies",
+      description: "Operations related to Replies' entities",
+    },
   ],
   paths: {
     "/api/v1/users/signup": {
@@ -531,7 +539,7 @@ const options = {
         tags: ["Exams"],
         summary: "View all free exams",
         description: "Get all registered free exams",
-        
+
         responses: {
           200: {
             description: "All exams retrieved",
@@ -1533,14 +1541,14 @@ const options = {
         },
       },
     },
-    "/api/v1/payments/{id}": {
+    "/api/v1/payments/{code}": {
       put: {
         tags: ["Payments"],
         summary: "Payment updating",
         description: "Update Payment by ID",
         parameters: [
           {
-            name: "id",
+            name: "code",
             in: "path",
             required: true,
             schema: {
@@ -1569,7 +1577,7 @@ const options = {
             description: "Payment Update succeed",
           },
           400: {
-            description: "UPad request",
+            description: "Bad request",
           },
           404: {
             description: "Payment not found",
@@ -1579,6 +1587,8 @@ const options = {
           },
         },
       },
+    },
+    "/api/v1/payments/{id}": {
       delete: {
         tags: ["Payments"],
         summary: "Delete Payment",
@@ -1645,6 +1655,328 @@ const options = {
         responses: {
           200: {
             description: "All notifications",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+
+    // Faqs docs
+    "/api/v1/faqs": {
+      post: {
+        tags: ["Faqs"],
+        summary: "Add faqs",
+        description: "Add a new faqs",
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  question: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          201: {
+            description: "Question recorded",
+          },
+          400: {
+            description: "Bad Request",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+      get: {
+        tags: ["Faqs"],
+        summary: "Get All Faqs",
+        description: "Get all Faqs",
+        responses: {
+          200: {
+            description: "All Faqs retrieved",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    "/api/v1/faqs/{id}": {
+      get: {
+        tags: ["Faqs"],
+        summary: "Read Faqs By ID",
+        description: "Get a Faqs by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Faqs retrieved",
+          },
+          404: {
+            description: "Faqs not found",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+      put: {
+        tags: ["Faqs"],
+        summary: "Faqs updating",
+        description: "Update Faqs by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  question: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Faqs Update succeed",
+          },
+          400: {
+            description: "Bad request",
+          },
+          404: {
+            description: "Faqs not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+      delete: {
+        tags: ["Faqs"],
+        summary: "Delete Faqs",
+        description: "Delete a Faqs by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Faqs deleted",
+          },
+          400: {
+            description: "Bad Request",
+          },
+          404: {
+            description: "Faqs not found",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    // Replies docs
+    "/api/v1/replies/{faqId}": {
+      post: {
+        tags: ["Replies"],
+        summary: "Add reply to Faqs",
+        description: "Faq Id to add reply",
+        parameters: [
+          {
+            name: "faqId",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  reply: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Igisubizo cyakiriwe",
+          },
+          400: {
+            description: "Bad request",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+      get: {
+        tags: ["Replies"],
+        summary: "Get all replies for specific Faqs",
+        description: "Get a replies by FaqId",
+        parameters: [
+          {
+            name: "faqId",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Igisubizo ni iki",
+          },
+          404: {
+            description: "Ikibazo ntikibonetse byagateganyo",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    "/api/v1/replies/{id}": {
+      put: {
+        tags: ["Replies"],
+        summary: "Reply updating",
+        description: "Update Reply by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        requestBody: {
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  reply: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          200: {
+            description: "Reply Update succeed",
+          },
+          400: {
+            description: "Bad request",
+          },
+          404: {
+            description: "Reply not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+      delete: {
+        tags: ["Replies"],
+        summary: "Delete Reply",
+        description: "Delete a Reply by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Reply deleted",
+          },
+          400: {
+            description: "Bad Request",
+          },
+          404: {
+            description: "Reply not found",
+          },
+          500: {
+            description: "Internal Server Error",
+          },
+        },
+      },
+    },
+    "/api/v1/replies/single/{id}": {
+      get: {
+        tags: ["Replies"],
+        summary: "Read reply By ID",
+        description: "Get a reply by ID",
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+            },
+          },
+        ],
+        responses: {
+          200: {
+            description: "Reply retrieved",
+          },
+          404: {
+            description: "Reply not found",
           },
           500: {
             description: "Internal Server Error",
