@@ -1,11 +1,12 @@
 import questionModel from "../models/questions.models";
 import examModel from "../models/exams.models";
 import optionModel from "../models/options.models";
+import { uploadToCloud } from "../helper/cloud";
 
 export const addQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    const { question } = req.body;
+    const { question, image } = req.body;
     if (!question) {
       return res.status(400).json({
         status: "400",
@@ -48,9 +49,12 @@ export const addQuestion = async (req, res) => {
         message: "Total questions' marks can't exceed exam marks",
       });
     }
+    let savedImage ;
+    if(req.file) savedImage = await uploadToCloud(req.file, res);
     const createQuestion = await questionModel.create({
       examId: id,
       question,
+      image: savedImage?.secure_url,
     });
     await examModel.findByIdAndUpdate(
       id,
@@ -75,7 +79,7 @@ export const addQuestion = async (req, res) => {
 export const updateQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    const { question } = req.body;
+    const { question, image } = req.body;
 
     const existingQuestion = await questionModel.findById(id);
     if (!existingQuestion) {
@@ -96,13 +100,17 @@ export const updateQuestion = async (req, res) => {
         message: "Question already exists",
       });
     }
-    existingQuestion.question = question;
-    await existingQuestion.save();
 
+    let savedImage;
+    if (req.file) savedImage = await uploadToCloud(req.file, res);
+    const updatedQuestion = await questionModel.findByIdAndUpdate(id, {
+      question,
+      image: savedImage?.secure_url,
+    },{ new: true } );
     return res.status(200).json({
       status: "200",
       message: "Question updated",
-      data: existingQuestion,
+      data: updatedQuestion,
     });
   } catch (error) {
     return res.status(500).json({

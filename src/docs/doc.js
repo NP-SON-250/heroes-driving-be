@@ -713,6 +713,10 @@ const options = {
                   question: {
                     type: "string",
                   },
+                  image: {
+                    type: "string",
+                    format: "binary",
+                  },
                 },
               },
             },
@@ -827,6 +831,10 @@ const options = {
                 properties: {
                   question: {
                     type: "string",
+                  },
+                  image: {
+                    type: "string",
+                    format: "binary",
                   },
                 },
               },

@@ -17,7 +17,7 @@ export const addCategory = async (req, res) => {
     if (!duration) {
       return res.status(400).json({
         status: "400",
-        message: "Exired time is required",
+        message: "Expired time is required",
       });
     }
     const checkCategory = await CategoryModel.findOne({ examsNumber });
@@ -32,13 +32,7 @@ export const addCategory = async (req, res) => {
         });
       }
     }
-    const checkCategoryType = await CategoryModel.findOne({type:"free"});
-    if (checkCategoryType) {
-      return res.status(404).json({
-        status: "404",
-        message: "Frea category exists, delete first one.",
-      });
-    }
+    
     const recordedCategory = await CategoryModel.create({
       examsNumber,
       amount,

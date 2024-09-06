@@ -14,13 +14,13 @@ const questionRoute = express.Router();
 questionRoute.post(
   "/record/:id",
   adminAuth,
-  fileSaver.single("question"),
+  fileSaver.single("image"),
   addQuestion
 );
 questionRoute.put(
   "/update/:id",
   adminAuth,
-  fileSaver.single("question"),
+  fileSaver.single("image"),
   updateQuestion
 );
 questionRoute.get("/all", allQuestions);
